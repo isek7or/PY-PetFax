@@ -1,9 +1,23 @@
+import os
 from flask import Flask
+from dotenv import load_dotenv
+from flask_migrate import Migrate
 
 
 def create_app():
     # configure app
     app = Flask(__name__)
+    
+    # load .env
+    load_dotenv()
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    from . import models
+    models.db.init_app(app)
+    
+    migrate = Migrate(app, models.db)
 
     # index route
     @app.route('/')
